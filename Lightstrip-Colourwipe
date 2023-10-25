@@ -1,0 +1,31 @@
+#include <Adafruit_NeoPixel.h>
+
+#define LED_PIN 2
+
+#define LED_COUNT 16
+
+int count = 0;
+
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+
+void setup() {
+  strip.begin();           
+  strip.setBrightness(10);
+}
+
+void loop() {
+  strip.clear(); 
+
+  for(int i=0; i<=LED_COUNT; i++) {
+    strip.setPixelColor(i, 0, 255, 0);
+    strip.show();
+    count++;
+    delay(100); 
+   
+    if(count>=3){
+     strip.setPixelColor(i-2, 0, 0, 0);
+  }
+  }
+  
+  
+}
