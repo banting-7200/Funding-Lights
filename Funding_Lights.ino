@@ -45,6 +45,8 @@ void loop()
    currentMillis = millis();
    buttonpressed = digitalRead(buttonPin);//read the state of the button *reads as 0 and 1, 1 = NOT pressed, 0 = pressed*
    potVal = analogRead(potPin);
+
+   int mapped_val = (map(potVal, 0, 1023, fundingGoal, 0) / 100) * 100; // switch potVal to values of 100 
    //potVal = map(potVal, 1023, 0, fundingGoal, 0);
    //Serial.println(potVal);
    //Serial.println(state);
@@ -53,19 +55,19 @@ void loop()
     //Serial.println("ButtonPressed");
     switch(state){
       case 0:
-      sponsorMoney = potVal;
+      sponsorMoney = mapped_val; //changed potval to mapped 
       //Serial.println(sponsorMoney);
       state++;
       break;
       
        case 1:
-       studentMoney = potVal;
+       studentMoney = mapped_val;//changed potval to mapped 
      // Serial.println(studentMoney);
        state++;
       break;
      
        case 2:
-       msicMoney = potVal;
+       msicMoney = mapped_val;//changed potval to mapped 
       //Serial.println(msicMoney);
        state++;
       break;
