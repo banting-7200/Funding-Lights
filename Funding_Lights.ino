@@ -23,6 +23,7 @@ bool buttonready = true;
 // potentiometer variables
 int potPin = A0;
 int potVal = 0;
+int incPin = 2; //increment button pin 
 
 // Timer and state change variables
 int state = 0;
@@ -31,6 +32,11 @@ unsigned long currentMillis = 0;
 unsigned long startMillis = 0;
 const unsigned long period = 3000;// the amount of time the button needs to be held down
 
+int increment_values[] = { 100, 50, 25 };
+int count = 0;  //element in increment values array
+bool buttonPress1 = false;
+
+
 void setup() {
   Serial.begin(9600);
   strip.begin();// Start the strip
@@ -38,6 +44,7 @@ void setup() {
   
   pinMode(buttonPin, INPUT_PULLUP);//setup the button pin
   pinMode(potPin, INPUT);
+  pinMode(incPin, INPUT);
 }
 
 void loop() 
@@ -46,10 +53,23 @@ void loop()
    buttonpressed = digitalRead(buttonPin);//read the state of the button *reads as 0 and 1, 1 = NOT pressed, 0 = pressed*
    potVal = analogRead(potPin);
 
-   int mapped_val = (map(potVal, 0, 1023, fundingGoal, 0) / 100) * 100; // switch potVal to values of 100 
    //potVal = map(potVal, 1023, 0, fundingGoal, 0);
    //Serial.println(potVal);
    //Serial.println(state);
+
+   if (digitalRead(incPin) == true && buttonPress1 == false) { //read 2 pin button, if clicked change increment value element (changes val (100, 50, 25))
+    buttonPress1 = true;
+    count++;
+    if (count >= sizeof(increment_values) / sizeof(increment_values[0])) {  
+      count = 0;
+    }
+  }
+  if (digitalRead(incPin) == false) {
+    buttonPress1 = false;
+  }
+
+  int mapped_val = (map(potVal, 0, 1023, fundingGoal, 0) / increment_values[count]) * increment_values[count]; //div initial number by x then * x for inc value 
+
   
   if (buttonpressed == 0 && buttonready == true) {//checks if the button is pressed and if it is ready to be pressed
     //Serial.println("ButtonPressed");
