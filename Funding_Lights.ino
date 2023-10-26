@@ -1,4 +1,5 @@
-#include <Adafruit_NeoPixel.h>
+
+  #include <Adafruit_NeoPixel.h>
 
 #define LED_PIN 6    // Define the pin for your LED matrix
 #define NUM_LEDS 48/*248*/  // Define the number of LEDs in your matrix
@@ -19,20 +20,62 @@ int buttonPin = 13; // The pin for the button which updates the lights
 bool buttonpressed = false;
 bool buttonready = true;
 
+// potentiometer variables
+int potPin = A0;
+int potVal = 0;
+
+// Timer and state change variables
+int state = 0;
+
+unsigned long currentMillis = 0;
+unsigned long startMillis = 0;
+const unsigned long period = 3000;// the amount of time the button needs to be held down
+
 void setup() {
   Serial.begin(9600);
   strip.begin();// Start the strip
   strip.show();  // Initialize all pixels to 'off'
   
   pinMode(buttonPin, INPUT_PULLUP);//setup the button pin
+  pinMode(potPin, INPUT);
 }
 
 void loop() 
 {
+   currentMillis = millis();
    buttonpressed = digitalRead(buttonPin);//read the state of the button *reads as 0 and 1, 1 = NOT pressed, 0 = pressed*
-
+   potVal = analogRead(potPin);
+   //potVal = map(potVal, 1023, 0, fundingGoal, 0);
+   //Serial.println(potVal);
+   //Serial.println(state);
+  
   if (buttonpressed == 0 && buttonready == true) {//checks if the button is pressed and if it is ready to be pressed
-    Serial.println("ButtonPressed");
+    //Serial.println("ButtonPressed");
+    switch(state){
+      case 0:
+      sponsorMoney = potVal;
+      //Serial.println(sponsorMoney);
+      state++;
+      break;
+      
+       case 1:
+       studentMoney = potVal;
+     // Serial.println(studentMoney);
+       state++;
+      break;
+     
+       case 2:
+       msicMoney = potVal;
+      //Serial.println(msicMoney);
+       state++;
+      break;
+
+      case 4:// case 4 above case 3 because if it was below the array delcaritor would freak out and die.
+      runTimer = true;
+      startMillis = currentMillis;
+      break;
+      
+      case 3: 
     /*
     This array will be fed into the animation function.
     It is poulated with the ammount of LEDs to turn on for each segement
@@ -42,11 +85,31 @@ void loop()
     int funds[] = {round(sponsorMoney / dollarsPerLED), round(studentMoney / dollarsPerLED), round(msicMoney / dollarsPerLED)};
 
     LightandAnim(funds, animSpeed);// Play the animation
+    state++;
+      break;  
+    }
     buttonready = false;//changes the button ready boolean to false to stop it from thinking the button is being pressed multiple times
   }
   if(buttonpressed == 1){//if the button is not pressed
     buttonready = true;//make the button ready to be pressed again
-    Serial.println("Button NOT pressed");
+    //Serial.println("Button NOT pressed");
+     runTimer = false;
+    if(state == 4)
+      startMillis = currentMillis;
+    
+  }
+  
+  if(runTimer){
+     Serial.println(currentMillis - startMillis);
+      if(currentMillis - startMillis >= period)
+      {
+        state = 0;
+        strip.clear();
+        strip.show();
+        
+        resetTimer = 0;
+        runTimer = false;
+      }
   }
 }
 
